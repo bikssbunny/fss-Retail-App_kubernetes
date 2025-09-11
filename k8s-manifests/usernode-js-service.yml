@@ -5,10 +5,10 @@ metadata:
   namespace: souvik
 spec:
   type: NodePort
-  ports:
-    - port: 3130         # Port inside the cluster
-      targetPort: 3130   # Port on the pod
-      nodePort: 30500    # Optional: Port on the node (must be between 30000-32767)
-      protocol: TCP
   selector:
-    app: userprofile
+    app: userprofile
+  ports:
+    - protocol: TCP
+      port: 3130         # Port inside the cluster (service port)
+      targetPort: 3130   # Port on the pod (containerPort in Deployment)
+      nodePort: 30500    # NodePort (must be 30000–32767)
