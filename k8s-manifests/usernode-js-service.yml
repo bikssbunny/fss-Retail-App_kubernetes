@@ -4,11 +4,11 @@ metadata:
   name: usernode-js-service
   namespace: souvik
 spec:
-  type: ClusterIP  # Use NodePort if LoadBalancer is not supported
+  type: NodePort
   ports:
-    - port: 3130
-      targetPort: 3130
-      nodePort: 30500
+    - port: 3130         # Port inside the cluster
+      targetPort: 3130   # Port on the pod
+      nodePort: 30500    # Optional: Port on the node (must be between 30000-32767)
       protocol: TCP
   selector:
-    app: userprofile
+    app: userprofile
