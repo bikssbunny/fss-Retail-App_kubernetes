@@ -11,4 +11,4 @@ spec:
     - protocol: TCP
       port: 3130         # Port inside the cluster (service port)
       targetPort: 3130   # Port on the pod (containerPort in Deployment)
-      nodePort: 30500    # NodePort (must be 30000–32767)
+      nodePort: 30501   # NodePort (must be 30000–32767)
