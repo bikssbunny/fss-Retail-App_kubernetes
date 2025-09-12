@@ -31,6 +31,272 @@ spec:
   resources:
     requests:
       storage: 10Gi 
-  volumeName: my-ebs-volume           
+  volumeName: my-ebs-volume
+
+
+for  instance 
+provider "aws" {
+  region = "eu-west-2"
+}
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0.0"
+    }
+  }
+  required_version = ">= 1.3.0"
+}
+
+# -------------------------
+# VPC Module
+# -------------------------
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.1.2"
+
+  name = "Preeti_shingeB4"
+  cidr = "10.0.0.0/16"
+
+  # 3 AZs in London
+  azs              = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+  public_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  private_subnets  = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+
+  enable_dns_hostnames    = true
+  enable_dns_support      = true
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "Preeti_shingeB4"
+  }
+}
+
+# -------------------------
+# Security Group
+# -------------------------
+resource "aws_security_group" "preeti_sg" {
+  name        = "Preeti_shingeB4-sg"
+  description = "Allow SSH and HTTP"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Preeti_shingeB4-sg"
+  }
+}
+
+# -------------------------
+# EC2 Instance
+# -------------------------
+resource "aws_instance" "preeti_ec2" {
+  ami                         = "ami-0fc5d935ebf8bc3bc" # Ubuntu 22.04 LTS in eu-west-2
+  instance_type               = "t3.micro"
+  subnet_id                   = module.vpc.public_subnets[0]
+  vpc_security_group_ids      = [aws_security_group.preeti_sg.id]
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "Preeti_shingeB4"
+  }
+}
+
+
+for cluster
+
+provider "aws" {
+  region = "eu-west-2"
+}
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0.0"
+    }
+  }
+
+  required_version = ">= 1.3.0"
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.1.2"
+
+  name = "Team3-vpc"
+  cidr = "10.0.0.0/16"
+
+  # 3 AZs in London
+  azs            = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+  public_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  map_public_ip_on_launch = true
+
+  tags = {
+    "kubernetes.io/cluster/eks-cluster" = "shared"
+  }
+
+  public_subnet_tags = {
+    "kubernetes.io/role/elb" = "1"
+  }
+}
+
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 21.0"
+
+  name               = "batch4-Team3-cluster"
+  kubernetes_version = "1.33"
+
+  addons = {
+    coredns                = {}
+    eks-pod-identity-agent = {
+      before_compute = true
+    }
+    kube-proxy             = {}
+    vpc-cni                = {
+      before_compute = true
+    }
+  }
+
+  # Optional
+  endpoint_public_access = true
+
+  # Optional: Adds the current caller identity as an administrator via cluster access entry
+  enable_cluster_creator_admin_permissions = true
+
+  eks_managed_node_groups = {
+    example = {
+      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
+      ami_type       = "AL2023_x86_64_STANDARD"
+      instance_types = ["t3.medium"]
+
+      min_size     = 2
+      max_size     = 2
+      desired_size = 2
+    }
+  }
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.public_subnets
+
+  tags = {
+    Owner     = "Team-3"
+    Terraform = "true"
+  }
+}
+
+ekssss
+
+provider "aws" {
+  region = "eu-west-2"
+}
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0.0"
+    }
+  }
+  required_version = ">= 1.3.0"
+}
+
+# -------------------------
+# VPC Module
+# -------------------------
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.1.2"
+
+  name = "Preeti_shingeB4"
+  cidr = "10.0.0.0/16"
+
+  # 3 AZs in London
+  azs              = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+  public_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  private_subnets  = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+
+  enable_dns_hostnames    = true
+  enable_dns_support      = true
+  map_public_ip_on_launch = true
+
+  tags = {
+    "kubernetes.io/cluster/Preeti_shingeB4" = "shared"
+  }
+
+  public_subnet_tags = {
+    "kubernetes.io/role/elb" = "1"
+  }
+
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb" = "1"
+  }
+}
+
+# -------------------------
+# EKS Cluster Module
+# -------------------------
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 21.0"
+
+  name               = "Preeti_shingeB4"
+  kubernetes_version = "1.31"
+
+  addons = {
+    coredns                = {}
+    eks-pod-identity-agent = { before_compute = true }
+    kube-proxy             = {}
+    vpc-cni                = { before_compute = true }
+  }
+
+  endpoint_public_access                   = true
+  enable_cluster_creator_admin_permissions = true
+
+  eks_managed_node_groups = {
+    Preeti_shingeB4 = {
+      ami_type       = "AL2023_x86_64_STANDARD"
+      instance_types = ["t3.medium"]
+      min_size       = 2
+      max_size       = 3
+      desired_size   = 2
+    }
+  }
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+
+  tags = {
+    Owner     = "Preeti_shingeB4"
+    Terraform = "true"
+  }
+}
 
   
